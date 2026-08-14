@@ -3,11 +3,10 @@ import datetime
 import os
 import random
 import smtplib
-
 import pandas as pd
-MY_EMAIL="bogdansinik@gmail.com"
-MY_PASSWORD="vhjt lpik gihi sljx"
 
+MY_EMAIL = os.environ.get("MY_EMAIL")
+MY_PASSWORD = os.environ.get("MY_PASSWORD")
 # 1. Update the birthdays.csv
 def add_birthday(name, email, birthday):
     data = pd.read_csv('birthdays.csv')
