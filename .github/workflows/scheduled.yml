@@ -39,10 +39,9 @@ jobs:
 
       - name: Run script
         env:
-          # Updated to pass your weather variables to main.py
-          API_KEY: ${{ vars.API_KEY }}
-          TELEGRAM_BOT_TOKEN: ${{ vars.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
-          LAT: ${{ vars.LAT }}
-          LON: ${{ vars.LON }}
+          API_KEY: ${{ secrets.API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          LAT: ${{ secrets.LAT }}
+          LON: ${{ secrets.LON }}
         run: python main.py
