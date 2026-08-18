@@ -1,47 +1,41 @@
-##################### Extra Hard Starting Project ######################
-import datetime
+import requests
 import os
-import random
-import smtplib
-import pandas as pd
 
-MY_EMAIL = os.environ.get("MY_EMAIL")
-MY_PASSWORD = os.environ.get("MY_PASSWORD")
-# 1. Update the birthdays.csv
-def add_birthday(name, email, birthday):
-    data = pd.read_csv('birthdays.csv')
-    birthday_list = birthday.split("/")
-    day = birthday_list[0]
-    month = birthday_list[1]
-    year = birthday_list[2]
-    row = pd.DataFrame([[name, email, year, month, day]], columns = data.columns)
-    row.to_csv('birthdays.csv', mode='a', header=False, index=False)
+OMW_Endpoint = "https://api.openweathermap.org/data/2.5/forecast"
+API_KEY = os.environ.get("API_KEY")
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
-def get_list_of_templates():
-    templates = []
-    for file in os.listdir("letter_templates"):
-        templates.append(file)
-    return templates
-#add_birthday("Dad", "bogdansinik@gmail.com", birthday="14/8/1959")
 
-data = pd.read_csv('birthdays.csv')
+LAT = os.environ.get("LAT")
+LON = os.environ.get("LON")
 
-# 2. Check if today matches a birthday in the birthdays.csv
-today = datetime.date.today()
-list_of_templates = get_list_of_templates()
-for index, row in data.iterrows():
-    birthday = datetime.date(int(row.year), int(row.month), int(row.day))
-    if today.month == birthday.month and today.day == birthday.day:
-# 3. If step 2 is true, pick a random letter from letter templates and replace the [NAME] with the person's actual name from birthdays.csv
-        random_template = random.choice(list_of_templates)
-        with open(f"letter_templates/{random_template}", "r") as f:
-            text = f.read()
-            text = text.replace("[NAME]", row["name"])
-# 4. Send the letter generated in step 3 to that person's email address.
-        with smtplib.SMTP("smtp.gmail.com", 587) as connection:
-            connection.starttls()
-            connection.login(MY_EMAIL, MY_PASSWORD)
-            connection.sendmail(from_addr=MY_EMAIL, to_addrs=row["email"], msg=f"Subject: Happy Birthday!\n\n{text}")
+print(LAT, LON)
+CNT = 4
+params = {"lat": LAT, "lon": LON, "appid": API_KEY, "cnt": CNT}
+response = requests.get(OMW_Endpoint, params=params)
+response.raise_for_status()
+weather_data = response.json()
+weather_codes = []
+will_rain = False
+for hour_data in weather_data["list"]:
+    code = int(hour_data["weather"][0]["id"])
+    weather_codes.append(code)
+    if code < 600:
+        will_rain = True
 
-print("Birthday greetings have been sent!")
+
+# if will_rain:
+if True:
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+
+    parameters = {
+        "chat_id": TELEGRAM_CHAT_ID,
+        "text": "It's going to rain today. Remember to bring an umbrella ☔️"
+    }
+
+    response = requests.post(url, data=parameters)
+    response.raise_for_status()
+
+    print("Notification sent successfully via Telegram!")
 
