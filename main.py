@@ -1,16 +1,16 @@
 import requests
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 OMW_Endpoint = "https://api.openweathermap.org/data/2.5/forecast"
-API_KEY = os.environ.get("API_KEY")
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
-TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
+API_KEY = os.getenv("API_KEY")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-
-LAT = os.environ.get("LAT")
-LON = os.environ.get("LON")
-
-print(LAT, LON)
+LAT = os.getenv("LAT")
+LON = os.getenv("LON")
 CNT = 4
 params = {"lat": LAT, "lon": LON, "appid": API_KEY, "cnt": CNT}
 response = requests.get(OMW_Endpoint, params=params)
@@ -25,7 +25,6 @@ for hour_data in weather_data["list"]:
         will_rain = True
 
 
-# if will_rain:
 if True:
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
 
