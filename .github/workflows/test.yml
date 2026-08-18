@@ -1,4 +1,4 @@
-name: Test Setup
+name: Test OpenWeather Setup
 
 on:
   workflow_dispatch:  # Manual trigger only
@@ -23,50 +23,48 @@ jobs:
 
       - name: Check secrets are configured
         env:
-          MY_EMAIL: ${{ secrets.MY_EMAIL }}
-          MY_PASSWORD: ${{ secrets.MY_PASSWORD }}
+          API_KEY: ${{ secrets.API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          LAT: ${{ secrets.LAT }}
+          LON: ${{ secrets.LON }}
         run: |
-          if [ -z "$MY_EMAIL" ]; then
-            echo "MY_EMAIL secret is not set!"
-            echo "Go to Settings > Secrets > Actions and add it."
-            exit 1
-          else
-            echo "MY_EMAIL is configured"
-          fi
+          missing_secrets=0
 
-          if [ -z "$MY_PASSWORD" ]; then
-            echo "MY_PASSWORD secret is not set!"
-            echo "Go to Settings > Secrets > Actions and add it."
+          for secret_name in API_KEY TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID LAT LON; do
+            eval val=\$$secret_name
+            if [ -z "$val" ]; then
+              echo "❌ $secret_name secret is not set!"
+              missing_secrets=1
+            else
+              echo "✅ $secret_name is configured"
+            fi
+          done
+
+          if [ $missing_secrets -eq 1 ]; then
+            echo ""
+            echo "Go to your Repository Settings > Secrets and variables > Actions and add the missing secrets."
             exit 1
-          else
-            echo "MY_PASSWORD is configured"
           fi
 
           echo ""
-          echo "All secrets are configured!"
+          echo "All required secrets are configured!"
 
       - name: Check required files exist
         run: |
           echo "Checking for required files..."
 
           if [ -f "main.py" ]; then
-            echo "main.py found"
+            echo "✅ main.py found"
           else
-            echo "main.py not found!"
+            echo "❌ main.py not found!"
             exit 1
           fi
 
           if [ -f "requirements.txt" ]; then
-            echo "requirements.txt found"
+            echo "✅ requirements.txt found"
           else
-            echo "requirements.txt not found!"
-            exit 1
-          fi
-
-          if [ -f "birthdays.csv" ]; then
-            echo "birthdays.csv found"
-          else
-            echo "birthdays.csv not found!"
+            echo "❌ requirements.txt not found!"
             exit 1
           fi
 
@@ -76,10 +74,21 @@ jobs:
       - name: Test Python syntax
         run: python -m py_compile main.py && echo "Python syntax OK"
 
+      - name: Run Weather Script Test
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          LAT: ${{ secrets.LAT }}
+          LON: ${{ secrets.LON }}
+        run: |
+          echo "Running main.py..."
+          python main.py
+
       - name: Success
         run: |
           echo ""
           echo "========================================"
-          echo "  All checks passed!"
-          echo "  Your setup is ready to go."
+          echo "  All checks and script execution passed!"
+          echo "  Your OpenWeather setup is ready to go."
           echo "========================================"
