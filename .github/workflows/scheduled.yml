@@ -3,15 +3,15 @@ name: Daily Script
 on:
   schedule:
     # ╔═══════════════════════════════════════════════════════════════╗
-    # ║  CHANGE THE LINE BELOW to set when your script runs          ║
-    # ║                                                                ║
-    # ║  Format:  'MINUTE HOUR * * *'                                  ║
-    # ║                                                                ║
-    # ║  Examples:                                                     ║
+    # ║  CHANGE THE LINE BELOW to set when your script runs           ║
+    # ║                                                               ║
+    # ║  Format:  'MINUTE HOUR * * *'                                 ║
+    # ║                                                               ║
+    # ║  Examples:                                                    ║
     # ║    '0 9 * * *'   = 9:00 AM UTC daily                          ║
     # ║    '30 14 * * *' = 2:30 PM UTC daily                          ║
     # ║    '0 0 * * *'   = Midnight UTC daily                         ║
-    # ║                                                                ║
+    # ║                                                               ║
     # ║  Use https://time.is/UTC to find your local time in UTC       ║
     # ╚═══════════════════════════════════════════════════════════════╝
     - cron: '50 13 * * *'
@@ -39,8 +39,10 @@ jobs:
 
       - name: Run script
         env:
-          # Your secrets are available as environment variables
-          # Add more secrets in Settings > Secrets > Actions
-          MY_EMAIL: ${{ secrets.MY_EMAIL }}
-          MY_PASSWORD: ${{ secrets.MY_PASSWORD }}
+          # Updated to pass your weather variables to main.py
+          API_KEY: ${{ vars.API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ vars.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
+          LAT: ${{ vars.LAT }}
+          LON: ${{ vars.LON }}
         run: python main.py
